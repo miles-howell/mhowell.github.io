@@ -1,4 +1,5 @@
 name: "Build and Deploy"
+
 on:
   push:
     branches:
@@ -45,21 +46,24 @@ jobs:
           ruby-version: 3.3
           bundler-cache: true
 
+      # Change is here: Removed the explicit destination folder.
       - name: Build site
-        run: bundle exec jekyll b -d "_site${{ steps.pages.outputs.base_path }}"
+        run: bundle exec jekyll b
         env:
           JEKYLL_ENV: "production"
 
+      # Change is here: Corrected the path for the link checker.
       - name: Test site
         run: |
           bundle exec htmlproofer _site \
-            \-\-disable-external \
-            \-\-ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"
+            --disable-external \
+            --ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"
 
+      # Change is here: Corrected the path for the artifact to upload.
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "_site${{ steps.pages.outputs.base_path }}"
+          path: "_site"
 
   deploy:
     environment:
